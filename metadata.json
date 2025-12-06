@@ -1,0 +1,9 @@
+{
+  "name": "MindMatrix.ai",
+  "description": "An AI-powered mental well-being analyzer that interprets text and voice inputs to assess emotional states, suggests personalized coping strategies, and connects users with local mental health resources.",
+  "requestFramePermissions": [
+    "microphone",
+    "geolocation",
+    "camera"
+  ]
+}

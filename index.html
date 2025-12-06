@@ -1,0 +1,137 @@
+
+<!DOCTYPE html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MindMatrix.ai - Mental Well-Being Assistant</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            colors: {
+              // Custom Warm/Magma Palette
+              // We rely on standard 'stone' for neutrals to avoid blue tones
+              
+              // Primary Accent: VIBRANT ORANGE
+              accent: {
+                DEFAULT: '#f97316', // Orange-500
+                hover: '#ea580c',   // Orange-600
+                light: '#ffedd5',   // Orange-100
+                dark: '#c2410c',    // Orange-700
+              },
+              // Friendly Highlights: AMBER
+              highlight: {
+                DEFAULT: '#fbbf24', // Amber-400
+                hover: '#f59e0b',
+                light: '#fffbeb',
+                dark: '#b45309',
+              },
+              // Light Mode Backgrounds (Peach/Rose)
+              warm: {
+                50: '#fff3e3', // Pale Peach
+                100: '#ffecec', // Soft Rose White
+                200: '#ffdcc5', 
+              }
+            },
+            fontFamily: {
+              sans: ['Varela Round', 'sans-serif'],
+              heading: ['Quicksand', 'sans-serif'],
+            },
+            animation: {
+              'fade-in': 'fadeIn 0.5s ease-out',
+              'fade-in-up': 'fadeInUp 0.8s ease-out forwards',
+              'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+              'bounce-slow': 'bounce 3s infinite',
+            },
+            keyframes: {
+              fadeIn: {
+                '0%': { opacity: '0' },
+                '100%': { opacity: '1' },
+              },
+              fadeInUp: {
+                '0%': { opacity: '0', transform: 'translateY(20px)' },
+                '100%': { opacity: '1', transform: 'translateY(0)' },
+              },
+            },
+            boxShadow: {
+              'soft': '0 8px 30px -4px rgba(0, 0, 0, 0.1)',
+              'soft-lg': '0 12px 40px -6px rgba(0, 0, 0, 0.15)',
+              'glow': '0 0 20px rgba(249, 115, 22, 0.4)', // Orange glow
+            },
+            borderRadius: {
+              '4xl': '2rem',
+              '5xl': '2.5rem',
+            }
+          },
+        },
+      }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Varela+Round&display=swap" rel="stylesheet">
+    <style>
+      body {
+        font-family: 'Varela Round', sans-serif;
+      }
+      h1, h2, h3, h4, h5, h6 {
+        font-family: 'Quicksand', sans-serif;
+      }
+      .blob {
+        background: rgba(249, 115, 22, 0.4); /* Orange */
+        border-radius: 50%;
+        box-shadow: 0 0 0 0 rgba(249, 115, 22, 1);
+        transform: scale(1);
+        animation: pulse-orange 2s infinite;
+      }
+      @keyframes pulse-orange {
+        0% {
+          transform: scale(0.95);
+          box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.7);
+        }
+        70% {
+          transform: scale(1);
+          box-shadow: 0 0 0 10px rgba(249, 115, 22, 0);
+        }
+        100% {
+          transform: scale(0.95);
+          box-shadow: 0 0 0 0 rgba(249, 115, 22, 0);
+        }
+      }
+      /* Custom Scrollbar */
+      .custom-scrollbar::-webkit-scrollbar {
+        width: 8px;
+      }
+      .custom-scrollbar::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      .custom-scrollbar::-webkit-scrollbar-thumb {
+        background-color: #a8a29e; /* Stone-400 */
+        border-radius: 20px;
+        border: 2px solid transparent;
+        background-clip: content-box;
+      }
+      .dark .custom-scrollbar::-webkit-scrollbar-thumb {
+        background-color: #57534e; /* Stone-600 */
+      }
+      .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background-color: #ea580c; /* Orange-600 */
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react": "https://aistudiocdn.com/react@^19.2.1",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.1/",
+    "react/": "https://aistudiocdn.com/react@^19.2.1/",
+    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.31.0",
+    "lucide-react": "https://aistudiocdn.com/lucide-react@^0.555.0",
+    "recharts": "https://aistudiocdn.com/recharts@^3.5.1"
+  }
+}
+</script>
+</head>
+  <body class="bg-warm-50 text-stone-800 dark:bg-stone-950 dark:text-stone-100 antialiased selection:bg-orange-500 selection:text-white transition-colors duration-300">
+    <div id="root"></div>
+  </body>
+</html>
