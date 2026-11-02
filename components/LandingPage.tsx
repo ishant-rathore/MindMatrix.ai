@@ -1,520 +1,777 @@
-
-import React, { useState, useEffect, useRef } from 'react';
-import { 
-  Sparkles, 
-  ArrowRight, 
-  BrainCircuit, 
-  ShieldCheck, 
-  Users, 
-  ChevronLeft, 
-  ChevronRight,
-  MessageSquare,
-  GraduationCap,
+import React, { useEffect, useRef, useState } from 'react';
+import {
+  Activity,
+  ArrowRight,
+  ArrowUpRight,
+  BrainCircuit,
   Briefcase,
-  Coffee,
-  Quote
+  Check,
+  ChevronRight,
+  GraduationCap,
+  Heart,
+  Languages,
+  MapPin,
+  Menu,
+  MessageCircle,
+  Mic,
+  Moon,
+  ShieldCheck,
+  Sparkles,
+  Users,
+  Waves,
+  X,
 } from 'lucide-react';
 
 interface LandingPageProps {
   onStart: () => void;
 }
 
-// --- DATA CONSTANTS ---
-
-const PERSONAS_SLIDES = [
-  {
-    id: 'ananya',
-    name: "Ananya",
-    role: "Empathetic Friend",
-    desc: "A warm, non-judgmental friend who listens to your worries and validates your feelings.",
-    quote: "I'm here to listen. Tell me what's on your mind.",
-    avatar: "https://randomuser.me/api/portraits/women/33.jpg",
-    color: "bg-orange-500",
-    gradient: "from-orange-600/30 to-stone-900"
-  },
-  {
-    id: 'aarav',
-    name: "Aarav",
-    role: "Goal Motivator",
-    desc: "High-energy coach to help you crush study goals and beat procrastination.",
-    quote: "Obstacles are just opportunities in disguise. Let's go!",
-    avatar: "https://randomuser.me/api/portraits/men/22.jpg",
-    color: "bg-red-500",
-    gradient: "from-red-600/30 to-stone-900"
-  },
-  {
-    id: 'dadaji',
-    name: "Dadaji",
-    role: "Wise Grandfather",
-    desc: "Ancient wisdom and patience to soothe anxiety and provide long-term perspective.",
-    quote: "Patience, my child. The storm will pass.",
-    avatar: "https://randomuser.me/api/portraits/men/90.jpg",
-    color: "bg-amber-500",
-    gradient: "from-amber-600/30 to-stone-900"
-  },
-  {
-    id: 'dr_anjali',
-    name: "Dr. Anjali",
-    role: "Health Guide",
-    desc: "Professional guidance on physical well-being, hygiene, and healthy habits.",
-    quote: "Health is your true wealth. Let's take care of it.",
-    avatar: "https://randomuser.me/api/portraits/women/52.jpg",
-    color: "bg-emerald-500", // Green instead of blue
-    gradient: "from-emerald-600/30 to-stone-900"
-  }
+const NAV_ITEMS = [
+  { label: 'Home', href: '#home' },
+  { label: 'Features', href: '#features' },
+  { label: 'How it works', href: '#how-it-works' },
+  { label: 'AI personas', href: '#personas' },
+  { label: 'About', href: '#responsible-ai' },
 ];
 
 const FEATURES = [
   {
-    icon: <BrainCircuit size={24} />,
-    title: "AI Mood Analysis",
-    desc: "Advanced sentiment detection understands your emotional state from text or voice inputs instantly.",
-    color: "text-orange-400",
-    bg: "bg-orange-900/30"
+    number: '01',
+    icon: BrainCircuit,
+    title: 'AI mood insights',
+    description:
+      'Explore an AI-generated summary of your emotional state and an estimated stress level from the words or voice you share.',
+    accent: 'orange',
   },
   {
-    icon: <Users size={24} />,
-    title: "Diverse Personas",
-    desc: "Choose from over 15 unique AI companions, from supportive friends to strict productivity coaches.",
-    color: "text-amber-400",
-    bg: "bg-amber-900/30"
+    number: '02',
+    icon: Users,
+    title: 'Personal AI companions',
+    description:
+      'Choose from specialized conversation personas for emotional support, study, productivity, career guidance and wellness.',
+    accent: 'violet',
   },
   {
-    icon: <ShieldCheck size={24} />,
-    title: "Private & Secure",
-    desc: "Your conversations are processed with strict privacy standards. You are safe here.",
-    color: "text-rose-400",
-    bg: "bg-rose-900/30"
-  }
+    number: '03',
+    icon: Mic,
+    title: 'Voice-powered check-ins',
+    description:
+      'Record a voice entry, use speech transcription and interact with voice-enabled AI experiences.',
+    accent: 'teal',
+  },
+  {
+    number: '04',
+    icon: Languages,
+    title: 'Speak your language',
+    description:
+      'Use the mood analysis experience in English, Hindi or Marathi, with responses tailored to your selected language.',
+    accent: 'amber',
+  },
+  {
+    number: '05',
+    icon: Activity,
+    title: 'Wellness history',
+    description:
+      'Revisit saved check-ins and view a simple visualization of stress-level entries over time.',
+    accent: 'rose',
+  },
+  {
+    number: '06',
+    icon: MapPin,
+    title: 'Local support discovery',
+    description:
+      'Explore nearby mental health resources using location-based discovery when you choose to share location access.',
+    accent: 'blue',
+  },
 ];
 
-const USE_CASES = [
+const STEPS = [
   {
-    title: "Exam Stress",
-    icon: <GraduationCap size={24} className="text-orange-400" />,
-    desc: "Overwhelmed by syllabus? Talk to 'Prof. Rao' to break it down into manageable chunks.",
-    gradient: "from-orange-900/30 to-stone-900"
+    number: '01',
+    title: 'Check in',
+    description: 'Write what is on your mind or record a voice entry in the language you prefer.',
+    icon: MessageCircle,
   },
   {
-    title: "Work Burnout",
-    icon: <Briefcase size={24} className="text-amber-400" />,
-    desc: "Feeling drained? 'Mr. Calm' provides instant relaxation techniques and perspective.",
-    gradient: "from-amber-900/30 to-stone-900"
+    number: '02',
+    title: 'AI reflects',
+    description: 'Gemini processes the submitted input and returns a structured, AI-generated reflection.',
+    icon: BrainCircuit,
   },
   {
-    title: "Loneliness",
-    icon: <Coffee size={24} className="text-rose-400" />,
-    desc: "Need a friend? 'Ananya' is always there to chat about your day, big or small.",
-    gradient: "from-rose-900/30 to-stone-900"
-  }
+    number: '03',
+    title: 'Explore next steps',
+    description: 'Review the emotional summary and practical coping suggestions generated for your check-in.',
+    icon: Sparkles,
+  },
+  {
+    number: '04',
+    title: 'Keep your history',
+    description: 'Continue conversations with AI personas and revisit saved check-ins and trends.',
+    icon: Activity,
+  },
 ];
 
-const TESTIMONIALS = [
+const PERSONAS = [
   {
-    name: "Priya S.",
-    role: "Student",
-    text: "I was having a panic attack before finals. The 'Dadaji' persona calmed me down in minutes. It felt so real.",
-    avatar: "https://randomuser.me/api/portraits/women/44.jpg"
+    initials: 'AN',
+    name: 'Ananya',
+    role: 'Empathetic Friend',
+    category: 'Emotional support',
+    description: 'A warm, non-judgmental companion who listens and validates feelings.',
+    tint: 'orange',
   },
   {
-    name: "Rahul K.",
-    role: "Software Engineer",
-    text: "The career mentor 'Vikrant' helped me prep for my interviews. It's like having a coach in my pocket.",
-    avatar: "https://randomuser.me/api/portraits/men/32.jpg"
+    initials: 'RA',
+    name: 'Rahul',
+    role: 'Best Friend',
+    category: 'Emotional support',
+    description: 'A supportive, easygoing friend for everyday conversations.',
+    tint: 'teal',
   },
   {
-    name: "Sarah M.",
-    role: "Artist",
-    text: "I love the privacy. I can share things I'm afraid to tell real people. It's a safe space.",
-    avatar: "https://randomuser.me/api/portraits/women/65.jpg"
-  }
+    initials: 'AA',
+    name: 'Aarav',
+    role: 'Goal Motivator',
+    category: 'Productivity',
+    description: 'An energetic coach focused on action, discipline and study goals.',
+    tint: 'rose',
+  },
+  {
+    initials: 'RI',
+    name: 'Riya',
+    role: 'Study Partner',
+    category: 'Productivity',
+    description: 'A calm study companion for breaking topics into manageable steps.',
+    tint: 'blue',
+  },
+  {
+    initials: 'DA',
+    name: 'Dadaji',
+    role: 'Grandfather',
+    category: 'Family wisdom',
+    description: 'A patient, grandfatherly perspective for thoughtful conversations.',
+    tint: 'amber',
+  },
+  {
+    initials: 'PR',
+    name: 'Prof. Rao',
+    role: 'Academic Guide',
+    category: 'Career & growth',
+    description: 'A mentor for academic pressure, career choices and confidence.',
+    tint: 'violet',
+  },
+  {
+    initials: 'VI',
+    name: 'Vikrant',
+    role: 'Career Mentor',
+    category: 'Career & growth',
+    description: 'Practical guidance on interviews, skill-building and work life.',
+    tint: 'teal',
+  },
+  {
+    initials: 'DR',
+    name: 'Dr. Anjali',
+    role: 'Health Guide',
+    category: 'Health & wellness',
+    description: 'A wellness-focused guide for healthy habits and everyday well-being.',
+    tint: 'green',
+  },
 ];
 
-// --- HELPER COMPONENT FOR SCROLL ANIMATIONS ---
-
-interface FadeInProps {
+interface RevealProps {
   children: React.ReactNode;
-  delay?: number;
   className?: string;
+  delay?: number;
 }
 
-const FadeIn: React.FC<FadeInProps> = ({ children, delay = 0, className = "" }) => {
-  const [isVisible, setIsVisible] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
+const Reveal: React.FC<RevealProps> = ({ children, className = '', delay = 0 }) => {
+  const [visible, setVisible] = useState(false);
+  const elementRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    const element = elementRef.current;
+    if (!element) return;
+
+    if (typeof IntersectionObserver === 'undefined') {
+      setVisible(true);
+      return;
+    }
+
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
-          setIsVisible(true);
+          setVisible(true);
           observer.unobserve(entry.target);
         }
       },
-      { threshold: 0.1, rootMargin: "0px 0px -50px 0px" }
+      { threshold: 0.12, rootMargin: '0px 0px -36px 0px' }
     );
-    if (ref.current) observer.observe(ref.current);
+
+    observer.observe(element);
     return () => observer.disconnect();
   }, []);
 
   return (
     <div
-      ref={ref}
-      className={`transition-all duration-1000 ease-out transform ${
-        isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'
-      } ${className}`}
-      style={{ transitionDelay: `${delay}ms` }}
+      ref={elementRef}
+      className={
+        'transform-gpu transition-all duration-700 ease-out motion-reduce:transform-none motion-reduce:transition-none ' +
+        (visible ? 'translate-y-0 opacity-100 ' : 'translate-y-7 opacity-0 ') +
+        className
+      }
+      style={{ transitionDelay: delay + 'ms' }}
     >
       {children}
     </div>
   );
 };
 
-// --- MAIN COMPONENT ---
+const Logo: React.FC = () => (
+  <span className="flex items-center gap-2.5">
+    <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-orange-500 text-white shadow-lg shadow-orange-500/20">
+      <BrainCircuit size={19} strokeWidth={2.2} />
+    </span>
+    <span className="text-[17px] font-bold tracking-tight text-white">
+      MindMatrix<span className="text-orange-400">.ai</span>
+    </span>
+  </span>
+);
+
+const ProductPreview: React.FC = () => (
+  <div className="relative mx-auto w-full max-w-[590px]">
+    <div className="absolute -inset-8 rounded-[3rem] bg-orange-500/10 blur-3xl" />
+    <div className="absolute -right-7 top-10 h-40 w-40 rounded-full bg-violet-500/10 blur-3xl" />
+    <div className="relative overflow-hidden rounded-[1.8rem] border border-white/10 bg-[#151210] shadow-[0_28px_100px_rgba(0,0,0,0.55)]">
+      <div className="flex items-center justify-between border-b border-white/[0.07] px-4 py-3 sm:px-5">
+        <div className="flex items-center gap-2">
+          <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-orange-500 text-white">
+            <BrainCircuit size={15} />
+          </span>
+          <span className="text-xs font-semibold text-stone-100">MindMatrix.ai</span>
+        </div>
+        <div className="flex items-center gap-2 text-[10px] text-stone-500">
+          <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+          AI companion
+        </div>
+      </div>
+
+      <div className="grid min-h-[350px] grid-cols-[112px_1fr] sm:grid-cols-[150px_1fr]">
+        <aside className="border-r border-white/[0.07] bg-black/20 p-3 sm:p-4">
+          <p className="mb-3 text-[9px] font-bold uppercase tracking-[0.17em] text-stone-600">Companions</p>
+          {[
+            ['AN', 'Ananya', 'bg-orange-500/20 text-orange-300'],
+            ['RA', 'Rahul', 'bg-teal-500/20 text-teal-300'],
+            ['AA', 'Aarav', 'bg-rose-500/20 text-rose-300'],
+            ['RI', 'Riya', 'bg-blue-500/20 text-blue-300'],
+          ].map((persona, index) => (
+            <div
+              key={persona[1]}
+              className={
+                'mb-2 flex items-center gap-2 rounded-xl px-2 py-2 ' +
+                (index === 0 ? 'border border-orange-500/20 bg-orange-500/10' : 'opacity-60')
+              }
+            >
+              <span className={'flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[8px] font-bold ' + persona[2]}>
+                {persona[0]}
+              </span>
+              <span className="truncate text-[9px] font-medium text-stone-300">{persona[1]}</span>
+            </div>
+          ))}
+          <div className="mt-5 border-t border-white/[0.07] pt-4">
+            <p className="text-[9px] leading-4 text-stone-600">More ways to reflect, learn and grow.</p>
+          </div>
+        </aside>
+
+        <div className="flex min-w-0 flex-col p-3 sm:p-5">
+          <div className="mb-5 flex items-center justify-between">
+            <div>
+              <p className="text-[9px] uppercase tracking-[0.16em] text-stone-600">Your conversation</p>
+              <p className="mt-1 text-xs font-semibold text-white sm:text-sm">Ananya · Empathetic Friend</p>
+            </div>
+            <span className="rounded-full border border-white/10 px-2.5 py-1 text-[9px] text-stone-500">Gemini AI</span>
+          </div>
+
+          <div className="mb-3 flex items-start gap-2">
+            <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-orange-500/15 text-orange-300">
+              <Heart size={13} />
+            </span>
+            <div className="max-w-[88%] rounded-2xl rounded-tl-md border border-white/[0.07] bg-white/[0.045] px-3 py-2.5">
+              <p className="text-[10px] leading-5 text-stone-300 sm:text-xs">Hey, I’m here to listen. What has been on your mind today?</p>
+            </div>
+          </div>
+
+          <div className="mb-4 flex justify-end">
+            <div className="max-w-[78%] rounded-2xl rounded-tr-md bg-orange-500 px-3 py-2.5">
+              <p className="text-[10px] leading-5 text-white sm:text-xs">I have a lot going on with my studies.</p>
+            </div>
+          </div>
+
+          <div className="mb-5 flex items-start gap-2">
+            <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-orange-500/15 text-orange-300">
+              <Sparkles size={13} />
+            </span>
+            <div className="max-w-[88%] rounded-2xl rounded-tl-md border border-white/[0.07] bg-white/[0.045] px-3 py-2.5">
+              <p className="text-[10px] leading-5 text-stone-300 sm:text-xs">That sounds like a lot to carry. We can take it one step at a time.</p>
+            </div>
+          </div>
+
+          <div className="mt-auto rounded-xl border border-white/10 bg-black/30 p-2.5">
+            <div className="flex items-center justify-between gap-2">
+              <span className="truncate text-[10px] text-stone-600">Write a message…</span>
+              <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-orange-500 text-white">
+                <ArrowRight size={13} />
+              </span>
+            </div>
+          </div>
+          <p className="mt-2 text-center text-[8px] tracking-wide text-stone-700">ILLUSTRATIVE PRODUCT PREVIEW</p>
+        </div>
+      </div>
+    </div>
+
+    <div className="absolute -left-4 top-20 hidden rounded-2xl border border-white/10 bg-[#211b17]/95 p-3 shadow-2xl backdrop-blur-xl sm:block lg:-left-12">
+      <div className="flex items-center gap-2">
+        <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-orange-500/15 text-orange-300">
+          <Activity size={16} />
+        </span>
+        <div>
+          <p className="text-[9px] text-stone-500">Check-in</p>
+          <p className="text-xs font-semibold text-white">Mood reflection</p>
+        </div>
+      </div>
+    </div>
+
+    <div className="absolute -bottom-5 -right-3 hidden rounded-2xl border border-white/10 bg-[#211b17]/95 p-3 shadow-2xl backdrop-blur-xl sm:block lg:-right-8">
+      <div className="flex items-center gap-2">
+        <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-violet-500/15 text-violet-300">
+          <Waves size={16} />
+        </span>
+        <div>
+          <p className="text-[9px] text-stone-500">Input options</p>
+          <p className="text-xs font-semibold text-white">Text & voice</p>
+        </div>
+      </div>
+    </div>
+  </div>
+);
 
 export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
-  const [currentSlide, setCurrentSlide] = useState(0);
   const [scrolled, setScrolled] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  // Auto-play slider
   useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % PERSONAS_SLIDES.length);
-    }, 5000);
-    return () => clearInterval(timer);
-  }, []);
-
-  // Scroll listener for navbar
-  useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 20);
-    window.addEventListener('scroll', handleScroll);
+    const handleScroll = () => setScrolled(window.scrollY > 12);
+    handleScroll();
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % PERSONAS_SLIDES.length);
-  const prevSlide = () => setCurrentSlide((prev) => (prev === 0 ? PERSONAS_SLIDES.length - 1 : prev - 1));
+  const closeMenu = () => setMobileMenuOpen(false);
+
+  const scrollToFeatures = () => {
+    document.getElementById('features')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
 
   return (
-    <div className="min-h-screen bg-stone-950 text-stone-200 font-sans selection:bg-orange-500 selection:text-white overflow-x-hidden transition-colors duration-300">
-      
-      {/* Background Ambience - Magma Theme */}
-      <div className="fixed top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
-         <div className="absolute top-[-10%] left-[-10%] w-[60%] h-[60%] bg-orange-900/10 rounded-full blur-[120px] animate-pulse-slow"></div>
-         <div className="absolute bottom-[-10%] right-[-10%] w-[60%] h-[60%] bg-red-900/10 rounded-full blur-[120px] animate-pulse-slow" style={{animationDelay: '2s'}}></div>
-         <div className="absolute top-[40%] left-[20%] w-[40%] h-[40%] bg-stone-900/50 rounded-full blur-[120px] animate-pulse-slow" style={{animationDelay: '4s'}}></div>
+    <div className="relative min-h-screen overflow-x-hidden bg-[#0c0a09] font-sans text-stone-200 selection:bg-orange-500/30 selection:text-white">
+      <div aria-hidden="true" className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
+        <div className="absolute -left-48 -top-48 h-[520px] w-[520px] rounded-full bg-orange-600/[0.09] blur-[130px]" />
+        <div className="absolute -right-48 top-[25%] h-[500px] w-[500px] rounded-full bg-violet-700/[0.07] blur-[140px]" />
+        <div className="absolute -bottom-64 left-[25%] h-[480px] w-[480px] rounded-full bg-orange-900/[0.08] blur-[140px]" />
       </div>
 
-      {/* Navbar */}
-      <nav className={`w-full fixed top-0 z-50 transition-all duration-500 ${scrolled ? 'bg-stone-950/80 backdrop-blur-md border-b border-stone-800 py-3 shadow-sm' : 'bg-transparent py-6'}`}>
-        <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
-          <div className="flex items-center gap-2 cursor-pointer group" onClick={() => window.scrollTo({top: 0, behavior: 'smooth'})}>
-            <div className="w-10 h-10 rounded-2xl bg-orange-500 text-white flex items-center justify-center transition-transform group-hover:scale-110 shadow-lg shadow-orange-500/20">
-               <BrainCircuit size={20} />
-            </div>
-            <span className="text-xl font-bold tracking-tight text-stone-100 group-hover:text-orange-500 transition-colors font-heading">
-              MindMatrix.ai
-            </span>
+      <header className={'fixed inset-x-0 top-0 z-50 border-b transition-all duration-300 ' + (scrolled ? 'border-white/[0.07] bg-[#0c0a09]/85 py-3 shadow-2xl shadow-black/20 backdrop-blur-2xl' : 'border-transparent bg-transparent py-5')}>
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-5 sm:px-8">
+          <a href="#home" aria-label="MindMatrix.ai home" onClick={closeMenu} className="relative z-10">
+            <Logo />
+          </a>
+
+          <nav className="hidden items-center gap-8 md:flex" aria-label="Main navigation">
+            {NAV_ITEMS.map((item) => (
+              <a key={item.href} href={item.href} className="text-xs font-semibold text-stone-400 transition-colors hover:text-white">
+                {item.label}
+              </a>
+            ))}
+          </nav>
+
+          <div className="hidden items-center gap-3 md:flex">
+            <button onClick={onStart} className="rounded-full px-4 py-2.5 text-xs font-semibold text-stone-300 transition-colors hover:text-white">
+              Log in
+            </button>
+            <button onClick={onStart} className="group inline-flex items-center gap-2 rounded-full bg-orange-500 px-5 py-2.5 text-xs font-bold text-white shadow-lg shadow-orange-500/15 transition-all hover:-translate-y-0.5 hover:bg-orange-400 active:translate-y-0">
+              Start chatting <ArrowUpRight size={14} className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+            </button>
           </div>
-          <div className="hidden md:flex items-center gap-8 text-sm font-semibold text-stone-400">
-            <a href="#features" className="hover:text-orange-500 transition-colors cursor-pointer">Features</a>
-            <a href="#use-cases" className="hover:text-orange-500 transition-colors cursor-pointer">Use Cases</a>
-            <a href="#personas" className="hover:text-orange-500 transition-colors cursor-pointer">Personas</a>
-            <div className="flex items-center gap-3 ml-4">
-              <button onClick={onStart} className="px-6 py-2.5 rounded-full border-2 border-stone-700 hover:border-orange-500 hover:text-orange-400 transition-all text-sm font-bold bg-stone-900 text-stone-300">
-                Login
-              </button>
-              <button 
-                onClick={onStart} 
-                className="px-6 py-2.5 bg-orange-500 hover:bg-orange-600 text-white rounded-full transition-all shadow-lg hover:shadow-orange-500/20 hover:-translate-y-0.5 active:scale-95 text-sm font-bold"
-              >
-                Start Chat
-              </button>
-            </div>
-          </div>
+
+          <button
+            type="button"
+            aria-label={mobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
+            aria-expanded={mobileMenuOpen}
+            onClick={() => setMobileMenuOpen((open) => !open)}
+            className="relative z-10 flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 bg-white/[0.04] text-stone-200 md:hidden"
+          >
+            {mobileMenuOpen ? <X size={19} /> : <Menu size={19} />}
+          </button>
         </div>
-      </nav>
 
-      {/* Hero Section */}
-      <section className="relative z-10 pt-40 pb-32 px-6 flex flex-col items-center text-center min-h-screen justify-center">
-        <div className="w-full max-w-4xl mx-auto">
-          
-          <FadeIn delay={0}>
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-stone-900 border border-stone-700 text-xs font-bold text-orange-400 mb-8 shadow-sm">
-              <span className="w-2.5 h-2.5 rounded-full bg-orange-500 animate-pulse"></span>
-              Powered by Gemini 2.5 Flash
-            </div>
-          </FadeIn>
-
-          <FadeIn delay={200}>
-            <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight text-white mb-6 leading-[1.1] font-heading">
-              Your warm AI companion for <br />
-              <span className="bg-gradient-to-r from-orange-400 via-rose-400 to-amber-400 bg-clip-text text-transparent">
-                Life, Study & Balance
-              </span>
-            </h1>
-          </FadeIn>
-          
-          <FadeIn delay={400}>
-            <p className="text-stone-400 text-lg md:text-xl max-w-2xl mx-auto mb-10 leading-relaxed font-medium">
-              An intelligent ecosystem of personas designed to support your mental well-being, 
-              boost your productivity, and provide wisdom when you need it most.
-            </p>
-          </FadeIn>
-
-          <FadeIn delay={600}>
-            <div className="flex flex-col sm:flex-row gap-4 w-full justify-center">
-              <button 
-                onClick={onStart}
-                className="px-8 py-4 bg-orange-500 hover:bg-orange-600 text-white rounded-full font-bold text-lg transition-all hover:scale-105 active:scale-95 shadow-xl shadow-orange-500/20 flex items-center justify-center gap-2 group"
-              >
-                Start Chatting <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
-              </button>
-              <button 
-                className="px-8 py-4 bg-stone-900 border-2 border-stone-700 hover:border-stone-600 text-stone-300 rounded-full font-bold text-lg transition-all hover:scale-105 active:scale-95 shadow-sm"
-              >
-                Learn More
-              </button>
-            </div>
-          </FadeIn>
-
-          {/* Glass Stats Bar */}
-          <FadeIn delay={800} className="mt-20">
-            <div className="grid grid-cols-3 gap-6 max-w-3xl mx-auto">
-               {[
-                 { label: "Active Personas", value: "15+" },
-                 { label: "Response Time", value: "< 1s" },
-                 { label: "Privacy", value: "100%" }
-               ].map((stat, i) => (
-                 <div key={i} className="p-6 rounded-3xl bg-stone-800/60 border border-stone-700 backdrop-blur-md shadow-soft hover:shadow-soft-lg transition-all hover:-translate-y-1">
-                   <div className="text-3xl font-extrabold text-white mb-1 font-heading">{stat.value}</div>
-                   <div className="text-xs text-stone-400 uppercase tracking-wider font-bold">{stat.label}</div>
-                 </div>
-               ))}
-            </div>
-          </FadeIn>
-        </div>
-      </section>
-
-      {/* Features Grid */}
-      <section id="features" className="py-24 relative z-10">
-        <div className="max-w-7xl mx-auto px-6">
-           <FadeIn>
-             <div className="text-center mb-20">
-                <h2 className="text-3xl md:text-5xl font-bold text-white mb-6 font-heading">Why MindMatrix?</h2>
-                <p className="text-stone-400 max-w-2xl mx-auto text-lg">More than just a chatbot. A complete emotional support system built for real life.</p>
-             </div>
-           </FadeIn>
-           
-           <div className="grid md:grid-cols-3 gap-8">
-             {FEATURES.map((feat, i) => (
-               <FadeIn key={i} delay={i * 200}>
-                 <div className="group p-8 rounded-[2.5rem] bg-stone-900 border border-stone-800 shadow-soft hover:shadow-xl transition-all duration-500 h-full hover:-translate-y-2">
-                    <div className={`w-16 h-16 rounded-3xl ${feat.bg} ${feat.color} flex items-center justify-center mb-8 group-hover:scale-110 transition-transform duration-500 rotate-3 group-hover:rotate-6`}>
-                      {feat.icon}
-                    </div>
-                    <h3 className="text-2xl font-bold text-white mb-4 font-heading">{feat.title}</h3>
-                    <p className="text-stone-400 leading-relaxed text-lg">{feat.desc}</p>
-                 </div>
-               </FadeIn>
-             ))}
-           </div>
-        </div>
-      </section>
-
-      {/* Use Cases Section */}
-      <section id="use-cases" className="py-32 relative z-10 bg-stone-900/50">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="flex flex-col md:flex-row gap-12 items-center">
-             <div className="md:w-1/3">
-                <FadeIn>
-                  <h2 className="text-3xl md:text-5xl font-bold text-white mb-6 leading-tight font-heading">
-                    Real support for <br />
-                    <span className="text-orange-400 underline decoration-4 decoration-orange-900 underline-offset-4">real problems.</span>
-                  </h2>
-                  <p className="text-stone-400 text-lg leading-relaxed mb-8">
-                    Life gets complicated. Whether it's academic pressure, career choices, or just feeling low, we have a specialist persona ready to help.
-                  </p>
-                  <button onClick={onStart} className="text-stone-200 font-bold flex items-center gap-2 hover:gap-4 transition-all group">
-                    Explore all scenarios <ArrowRight className="text-orange-400" />
-                  </button>
-                </FadeIn>
-             </div>
-
-             <div className="md:w-2/3 grid gap-6">
-               {USE_CASES.map((useCase, i) => (
-                 <FadeIn key={i} delay={i * 150}>
-                    <div className={`flex items-center gap-6 p-6 rounded-3xl bg-stone-900 shadow-sm border border-stone-800 hover:shadow-md transition-all group cursor-default hover:scale-[1.02]`}>
-                       <div className={`w-14 h-14 rounded-full bg-gradient-to-br ${useCase.gradient} flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform shadow-sm`}>
-                          {useCase.icon}
-                       </div>
-                       <div>
-                          <h4 className="text-xl font-bold text-white mb-1 font-heading">{useCase.title}</h4>
-                          <p className="text-stone-400 text-sm">{useCase.desc}</p>
-                       </div>
-                    </div>
-                 </FadeIn>
-               ))}
-             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Persona Slider Section */}
-      <section id="personas" className="py-24 relative z-10 overflow-hidden">
-        <div className="max-w-7xl mx-auto px-6 relative">
-           <FadeIn>
-             <div className="text-center mb-16">
-                <h2 className="text-3xl md:text-5xl font-bold text-white mb-6 font-heading">Meet Your Companions</h2>
-                <p className="text-stone-400 max-w-2xl mx-auto text-lg">A diverse team of AI personalities ready to support you 24/7.</p>
-             </div>
-           </FadeIn>
-
-           {/* Carousel Container */}
-           <FadeIn delay={200}>
-             <div className="relative w-full max-w-5xl mx-auto h-[500px] md:h-[450px]">
-                {PERSONAS_SLIDES.map((persona, index) => {
-                   // Calculate position for visual stacking
-                   let position = 'opacity-0 translate-x-full scale-90 z-0';
-                   if (index === currentSlide) position = 'opacity-100 translate-x-0 scale-100 z-20';
-                   if (index === (currentSlide - 1 + PERSONAS_SLIDES.length) % PERSONAS_SLIDES.length) position = 'opacity-40 -translate-x-16 scale-90 z-10 blur-[2px]';
-                   if (index === (currentSlide + 1) % PERSONAS_SLIDES.length) position = 'opacity-40 translate-x-16 scale-90 z-10 blur-[2px]';
-
-                   return (
-                     <div 
-                        key={persona.id}
-                        className={`absolute inset-0 transition-all duration-700 ease-out flex items-center justify-center ${position}`}
-                     >
-                        {/* Glass Card Slide */}
-                        <div className={`w-full max-w-4xl bg-gradient-to-br ${persona.gradient} border border-stone-700 p-8 md:p-12 rounded-[3rem] shadow-xl flex flex-col md:flex-row items-center gap-8 md:gap-16 bg-stone-900/90`}>
-                           
-                           {/* Avatar Side */}
-                           <div className="relative flex-shrink-0 group cursor-pointer">
-                              <div className={`absolute inset-0 ${persona.color} blur-[50px] opacity-20 rounded-full animate-pulse-slow`}></div>
-                              <img 
-                                src={persona.avatar} 
-                                alt={persona.name} 
-                                className="relative w-40 h-40 md:w-56 md:h-56 rounded-full object-cover border-8 border-stone-800 shadow-xl transition-transform duration-500 group-hover:scale-105 transform rotate-3"
-                              />
-                              <div className={`absolute bottom-6 right-6 ${persona.color} p-4 rounded-full text-white border-4 border-stone-800 shadow-lg`}>
-                                 <MessageSquare size={24} fill="currentColor" />
-                              </div>
-                           </div>
-
-                           {/* Content Side */}
-                           <div className="text-center md:text-left flex-1">
-                              <h3 className="text-4xl font-bold text-white mb-2 font-heading">{persona.name}</h3>
-                              <div className={`inline-block px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider bg-black/20 mb-8 text-stone-300 border border-stone-700 shadow-sm`}>
-                                 {persona.role}
-                              </div>
-                              
-                              <p className="text-xl md:text-2xl text-stone-200 font-medium italic mb-8 leading-relaxed">"{persona.quote}"</p>
-                              <p className="text-base text-stone-400 leading-relaxed border-t border-stone-700/50 pt-8 font-medium">
-                                 {persona.desc}
-                              </p>
-                           </div>
-
-                        </div>
-                     </div>
-                   );
-                })}
-             </div>
-           </FadeIn>
-           
-           {/* Controls */}
-           <FadeIn delay={400}>
-             <div className="flex justify-center items-center gap-8 mt-12 z-30 relative">
-                <button 
-                  onClick={prevSlide}
-                  className="p-4 rounded-full bg-stone-900 border border-stone-700 hover:border-orange-500 hover:text-orange-500 transition-all text-stone-500 hover:scale-110 active:scale-95 shadow-sm"
-                >
-                  <ChevronLeft size={24} />
+        {mobileMenuOpen && (
+          <div className="absolute inset-x-0 top-full border-b border-white/10 bg-[#100d0b]/98 px-5 pb-5 pt-3 shadow-2xl backdrop-blur-2xl md:hidden">
+            <nav className="flex flex-col" aria-label="Mobile navigation">
+              {NAV_ITEMS.map((item) => (
+                <a key={item.href} href={item.href} onClick={closeMenu} className="rounded-xl px-3 py-3 text-sm font-medium text-stone-300 transition-colors hover:bg-white/[0.05] hover:text-white">
+                  {item.label}
+                </a>
+              ))}
+              <div className="mt-3 grid grid-cols-2 gap-2 border-t border-white/[0.08] pt-4">
+                <button onClick={() => { closeMenu(); onStart(); }} className="rounded-full border border-white/15 px-4 py-3 text-sm font-semibold text-stone-200">
+                  Log in
                 </button>
-                
-                <div className="flex gap-4">
-                  {PERSONAS_SLIDES.map((_, idx) => (
-                    <button
-                      key={idx}
-                      onClick={() => setCurrentSlide(idx)}
-                      className={`h-2 rounded-full transition-all duration-500 ${idx === currentSlide ? 'w-12 bg-orange-500' : 'w-2 bg-stone-700 hover:bg-stone-600'}`}
-                    />
-                  ))}
+                <button onClick={() => { closeMenu(); onStart(); }} className="rounded-full bg-orange-500 px-4 py-3 text-sm font-bold text-white">
+                  Start chatting
+                </button>
+              </div>
+            </nav>
+          </div>
+        )}
+      </header>
+
+      <main className="relative z-10">
+        <section id="home" className="relative scroll-mt-24 px-5 pb-24 pt-32 sm:px-8 sm:pb-32 sm:pt-40 lg:pb-36 lg:pt-44">
+          <div className="mx-auto grid max-w-7xl items-center gap-16 lg:grid-cols-[0.92fr_1.08fr] lg:gap-12">
+            <div className="relative z-10 max-w-2xl">
+              <Reveal>
+                <div className="mb-7 inline-flex items-center gap-2 rounded-full border border-orange-400/20 bg-orange-400/[0.07] px-3.5 py-2 text-[10px] font-bold uppercase tracking-[0.16em] text-orange-300 sm:text-[11px]">
+                  <Sparkles size={13} />
+                  A more thoughtful kind of AI companion
                 </div>
+              </Reveal>
 
-                <button 
-                  onClick={nextSlide}
-                  className="p-4 rounded-full bg-stone-900 border border-stone-700 hover:border-orange-500 hover:text-orange-500 transition-all text-stone-500 hover:scale-110 active:scale-95 shadow-sm"
-                >
-                  <ChevronRight size={24} />
-                </button>
-             </div>
-           </FadeIn>
+              <Reveal delay={90}>
+                <h1 className="max-w-3xl text-[2.8rem] font-semibold leading-[1.06] tracking-[-0.055em] text-white sm:text-6xl lg:text-[4.55rem]">
+                  Your mind deserves
+                  <span className="mt-1 block bg-gradient-to-r from-orange-300 via-orange-400 to-rose-400 bg-clip-text pb-2 text-transparent">
+                    a smarter companion.
+                  </span>
+                </h1>
+              </Reveal>
 
-        </div>
-      </section>
+              <Reveal delay={160}>
+                <p className="mt-7 max-w-xl text-sm leading-7 text-stone-400 sm:text-base sm:leading-8">
+                  An AI-powered space to explore your emotions, find perspective and build a healthier relationship with your well-being — one conversation at a time.
+                </p>
+              </Reveal>
 
-      {/* Testimonials Section */}
-      <section className="py-32 relative z-10 bg-stone-900">
-        <div className="max-w-7xl mx-auto px-6">
-          <FadeIn>
-            <div className="text-center mb-20">
-              <h2 className="text-3xl md:text-5xl font-bold text-white mb-6 font-heading">Community Voices</h2>
-              <p className="text-stone-400 max-w-2xl mx-auto text-lg">See how MindMatrix is helping people find balance.</p>
+              <Reveal delay={230}>
+                <div className="mt-9 flex flex-col gap-3 sm:flex-row">
+                  <button onClick={onStart} className="group inline-flex items-center justify-center gap-3 rounded-full bg-orange-500 px-7 py-4 text-sm font-bold text-white shadow-xl shadow-orange-500/20 transition-all hover:-translate-y-1 hover:bg-orange-400 active:translate-y-0">
+                    Start your journey
+                    <ArrowRight size={17} className="transition-transform group-hover:translate-x-1" />
+                  </button>
+                  <button onClick={scrollToFeatures} className="inline-flex items-center justify-center gap-2 rounded-full border border-white/15 bg-white/[0.025] px-7 py-4 text-sm font-semibold text-stone-300 transition-all hover:border-white/30 hover:bg-white/[0.06] hover:text-white">
+                    Explore features <ChevronRight size={16} />
+                  </button>
+                </div>
+              </Reveal>
+
+              <Reveal delay={300}>
+                <div className="mt-10 flex flex-wrap items-center gap-x-6 gap-y-3 border-t border-white/[0.08] pt-6 text-[11px] font-medium text-stone-500">
+                  <span className="inline-flex items-center gap-2"><MessageCircle size={14} className="text-orange-400" /> AI conversations</span>
+                  <span className="inline-flex items-center gap-2"><Mic size={14} className="text-orange-400" /> Text & voice check-ins</span>
+                  <span className="inline-flex items-center gap-2"><Languages size={14} className="text-orange-400" /> English · Hindi · Marathi</span>
+                </div>
+              </Reveal>
             </div>
-          </FadeIn>
 
-          <div className="grid md:grid-cols-3 gap-8">
-            {TESTIMONIALS.map((t, i) => (
-              <FadeIn key={i} delay={i * 200}>
-                <div className="p-8 rounded-[2.5rem] bg-stone-800 border border-stone-700 relative hover:bg-stone-700/50 transition-colors h-full">
-                  <Quote className="absolute top-8 right-8 text-stone-600" size={48} />
-                  <div className="flex items-center gap-4 mb-6">
-                    <img src={t.avatar} alt={t.name} className="w-12 h-12 rounded-full border-2 border-stone-600 shadow-sm" />
-                    <div>
-                      <div className="font-bold text-stone-200 font-heading">{t.name}</div>
-                      <div className="text-xs text-orange-400 uppercase tracking-wider font-bold">{t.role}</div>
+            <Reveal delay={180} className="relative px-1 py-4 sm:px-5 lg:px-0">
+              <ProductPreview />
+            </Reveal>
+          </div>
+
+          <div aria-hidden="true" className="pointer-events-none absolute bottom-0 left-1/2 h-px w-[min(90%,1100px)] -translate-x-1/2 bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+        </section>
+
+        <section id="product" className="scroll-mt-24 px-5 py-24 sm:px-8 sm:py-28">
+          <div className="mx-auto grid max-w-7xl items-center gap-12 lg:grid-cols-[0.8fr_1.2fr]">
+            <Reveal>
+              <p className="mb-4 text-[10px] font-bold uppercase tracking-[0.2em] text-orange-400">The experience</p>
+              <h2 className="text-3xl font-semibold leading-tight tracking-tight text-white sm:text-5xl">
+                More than a chat.
+                <span className="block text-stone-500">A space to check in with yourself.</span>
+              </h2>
+              <p className="mt-6 max-w-lg text-sm leading-7 text-stone-400 sm:text-base">
+                Move between guided check-ins, conversational AI companions and a personal history of saved reflections — all within one connected experience.
+              </p>
+              <button onClick={onStart} className="mt-8 inline-flex items-center gap-2 text-sm font-bold text-orange-300 transition-colors hover:text-orange-200">
+                Explore MindMatrix.ai <ArrowUpRight size={16} />
+              </button>
+            </Reveal>
+
+            <Reveal delay={120}>
+              <div className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-gradient-to-br from-[#201812] via-[#171311] to-[#12100f] p-5 shadow-2xl sm:p-8">
+                <div className="absolute -right-16 -top-20 h-56 w-56 rounded-full bg-orange-500/10 blur-3xl" />
+                <div className="relative grid gap-4 sm:grid-cols-[1.05fr_0.95fr]">
+                  <div className="rounded-2xl border border-white/10 bg-black/25 p-5">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-semibold text-white">A moment for you</span>
+                      <span className="rounded-full bg-orange-500/10 px-2.5 py-1 text-[9px] text-orange-300">Check-in</span>
+                    </div>
+                    <p className="mt-8 text-sm leading-6 text-stone-400">How are you feeling today?</p>
+                    <div className="mt-4 grid grid-cols-3 gap-2">
+                      {[
+                        ['😊', 'Good'],
+                        ['😐', 'Okay'],
+                        ['😟', 'Low'],
+                      ].map((item) => (
+                        <div key={item[1]} className="rounded-xl border border-white/[0.08] bg-white/[0.035] px-2 py-3 text-center">
+                          <span className="block text-xl">{item[0]}</span>
+                          <span className="mt-1 block text-[10px] text-stone-400">{item[1]}</span>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="mt-5 rounded-xl border border-white/10 bg-black/30 p-3">
+                      <p className="text-[10px] text-stone-600">Write a little about your day…</p>
+                      <div className="mt-4 flex justify-end">
+                        <span className="rounded-lg bg-orange-500 px-3 py-1.5 text-[9px] font-bold text-white">Continue</span>
+                      </div>
+                    </div>
+                    <p className="mt-3 text-center text-[8px] tracking-wide text-stone-700">ILLUSTRATIVE PRODUCT PREVIEW</p>
+                  </div>
+
+                  <div className="flex flex-col gap-4">
+                    <div className="rounded-2xl border border-white/10 bg-black/25 p-5">
+                      <div className="flex items-center gap-2">
+                        <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-violet-500/15 text-violet-300"><Waves size={16} /></span>
+                        <div>
+                          <p className="text-xs font-semibold text-white">Voice check-in</p>
+                          <p className="text-[9px] text-stone-600">Speak naturally</p>
+                        </div>
+                      </div>
+                      <div className="mt-6 flex h-10 items-center justify-center gap-1">
+                        {[12, 22, 15, 30, 18, 34, 16, 27, 11, 22, 31, 15, 24, 12, 19, 29, 14].map((height, index) => (
+                          <span key={index} className="w-1 rounded-full bg-gradient-to-t from-orange-500/40 to-orange-300" style={{ height: height + 'px' }} />
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="flex-1 rounded-2xl border border-white/10 bg-black/25 p-5">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-semibold text-white">Your reflections</span>
+                        <Activity size={15} className="text-orange-300" />
+                      </div>
+                      <div className="mt-5 flex items-end gap-2">
+                        {[30, 45, 36, 58, 43, 68, 52].map((height, index) => (
+                          <div key={index} className="flex-1 rounded-t-md bg-gradient-to-t from-orange-600/40 to-orange-300/80" style={{ height: height + 'px' }} />
+                        ))}
+                      </div>
+                      <p className="mt-3 text-[9px] leading-4 text-stone-600">A visual history of saved check-ins. Your own entries populate this view.</p>
                     </div>
                   </div>
-                  <p className="text-stone-400 leading-relaxed relative z-10 font-medium">"{t.text}"</p>
                 </div>
-              </FadeIn>
-            ))}
+              </div>
+            </Reveal>
+          </div>
+        </section>
+
+        <section id="features" className="scroll-mt-24 border-y border-white/[0.06] bg-white/[0.018] px-5 py-24 sm:px-8 sm:py-28">
+          <div className="mx-auto max-w-7xl">
+            <Reveal className="mx-auto max-w-2xl text-center">
+              <p className="mb-4 text-[10px] font-bold uppercase tracking-[0.2em] text-orange-400">Thoughtfully designed features</p>
+              <h2 className="text-3xl font-semibold tracking-tight text-white sm:text-5xl">Tools for a more mindful everyday.</h2>
+              <p className="mt-5 text-sm leading-7 text-stone-400 sm:text-base">
+                A connected set of AI-powered experiences to help you reflect, communicate and explore helpful next steps.
+              </p>
+            </Reveal>
+
+            <div className="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {FEATURES.map((feature, index) => {
+                const Icon = feature.icon;
+                const accentClasses: Record<string, string> = {
+                  orange: 'bg-orange-500/10 text-orange-300 ring-orange-400/15',
+                  violet: 'bg-violet-500/10 text-violet-300 ring-violet-400/15',
+                  teal: 'bg-teal-500/10 text-teal-300 ring-teal-400/15',
+                  amber: 'bg-amber-500/10 text-amber-300 ring-amber-400/15',
+                  rose: 'bg-rose-500/10 text-rose-300 ring-rose-400/15',
+                  blue: 'bg-sky-500/10 text-sky-300 ring-sky-400/15',
+                };
+                return (
+                  <Reveal key={feature.number} delay={index * 55}>
+                    <article className="group h-full rounded-[1.6rem] border border-white/[0.08] bg-[#151210]/90 p-6 transition-all duration-300 hover:-translate-y-1 hover:border-orange-400/25 hover:bg-[#1a1512] sm:p-7">
+                      <div className="mb-8 flex items-center justify-between">
+                        <span className={'flex h-11 w-11 items-center justify-center rounded-2xl ring-1 ' + accentClasses[feature.accent]}>
+                          <Icon size={20} />
+                        </span>
+                        <span className="text-[10px] font-semibold tracking-[0.16em] text-stone-700">{feature.number}</span>
+                      </div>
+                      <h3 className="text-lg font-semibold text-white">{feature.title}</h3>
+                      <p className="mt-3 text-sm leading-6 text-stone-500">{feature.description}</p>
+                      <div className="mt-6 h-px w-10 bg-orange-500/50 transition-all duration-300 group-hover:w-16" />
+                    </article>
+                  </Reveal>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+
+        <section id="how-it-works" className="scroll-mt-24 px-5 py-24 sm:px-8 sm:py-28">
+          <div className="mx-auto max-w-7xl">
+            <div className="grid gap-12 lg:grid-cols-[0.8fr_1.2fr]">
+              <Reveal>
+                <p className="mb-4 text-[10px] font-bold uppercase tracking-[0.2em] text-orange-400">A simple flow</p>
+                <h2 className="text-3xl font-semibold leading-tight tracking-tight text-white sm:text-5xl">Small moments.<span className="block text-stone-500">More room to reflect.</span></h2>
+                <p className="mt-6 max-w-md text-sm leading-7 text-stone-400 sm:text-base">
+                  Start with what you are comfortable sharing. MindMatrix.ai turns your check-in into an opportunity for reflection and a practical next step.
+                </p>
+              </Reveal>
+
+              <div className="grid gap-3 sm:grid-cols-2">
+                {STEPS.map((step, index) => {
+                  const Icon = step.icon;
+                  return (
+                    <Reveal key={step.number} delay={index * 70}>
+                      <div className="h-full rounded-2xl border border-white/[0.08] bg-white/[0.025] p-6 transition-colors hover:border-orange-400/20 hover:bg-white/[0.04]">
+                        <div className="mb-7 flex items-center justify-between">
+                          <span className="text-xs font-bold tracking-[0.16em] text-orange-400">{step.number}</span>
+                          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-orange-500/10 text-orange-300"><Icon size={17} /></span>
+                        </div>
+                        <h3 className="text-base font-semibold text-white">{step.title}</h3>
+                        <p className="mt-2 text-sm leading-6 text-stone-500">{step.description}</p>
+                      </div>
+                    </Reveal>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="personas" className="scroll-mt-24 border-y border-white/[0.06] bg-[#100d0b] px-5 py-24 sm:px-8 sm:py-28">
+          <div className="mx-auto max-w-7xl">
+            <Reveal className="mx-auto max-w-2xl text-center">
+              <p className="mb-4 text-[10px] font-bold uppercase tracking-[0.2em] text-orange-400">Meet your companions</p>
+              <h2 className="text-3xl font-semibold tracking-tight text-white sm:text-5xl">Different perspectives. One place.</h2>
+              <p className="mt-5 text-sm leading-7 text-stone-400 sm:text-base">
+                Explore the support personas currently available in MindMatrix.ai, each designed with a distinct conversational role.
+              </p>
+            </Reveal>
+
+            <div className="mt-14 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+              {PERSONAS.map((persona, index) => {
+                const tintClasses: Record<string, string> = {
+                  orange: 'bg-orange-500/15 text-orange-300 ring-orange-400/15',
+                  teal: 'bg-teal-500/15 text-teal-300 ring-teal-400/15',
+                  rose: 'bg-rose-500/15 text-rose-300 ring-rose-400/15',
+                  blue: 'bg-sky-500/15 text-sky-300 ring-sky-400/15',
+                  amber: 'bg-amber-500/15 text-amber-300 ring-amber-400/15',
+                  violet: 'bg-violet-500/15 text-violet-300 ring-violet-400/15',
+                  green: 'bg-emerald-500/15 text-emerald-300 ring-emerald-400/15',
+                };
+                return (
+                  <Reveal key={persona.name} delay={index * 45}>
+                    <article className="group h-full rounded-2xl border border-white/[0.08] bg-white/[0.025] p-5 transition-all hover:-translate-y-1 hover:border-white/15 hover:bg-white/[0.045]">
+                      <div className="flex items-start justify-between gap-3">
+                        <span className={'flex h-12 w-12 items-center justify-center rounded-2xl text-xs font-bold ring-1 ' + tintClasses[persona.tint]}>{persona.initials}</span>
+                        <span className="rounded-full border border-white/[0.08] px-2.5 py-1 text-[9px] text-stone-500">{persona.category}</span>
+                      </div>
+                      <h3 className="mt-5 text-base font-semibold text-white">{persona.name}</h3>
+                      <p className="mt-1 text-xs font-semibold text-orange-300">{persona.role}</p>
+                      <p className="mt-3 text-xs leading-5 text-stone-500">{persona.description}</p>
+                    </article>
+                  </Reveal>
+                );
+              })}
+            </div>
+
+            <Reveal delay={120}>
+              <div className="mt-9 text-center">
+                <button onClick={onStart} className="inline-flex items-center gap-2 rounded-full border border-white/15 px-6 py-3 text-xs font-bold text-stone-200 transition-all hover:border-orange-400/40 hover:bg-orange-500/5 hover:text-orange-200">
+                  Explore AI companions <ArrowUpRight size={14} />
+                </button>
+              </div>
+            </Reveal>
+          </div>
+        </section>
+
+        <section id="responsible-ai" className="scroll-mt-24 px-5 py-24 sm:px-8 sm:py-28">
+          <div className="mx-auto max-w-5xl">
+            <Reveal>
+              <div className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-gradient-to-br from-[#1d1713] via-[#171311] to-[#12100f] p-7 sm:p-11">
+                <div className="absolute -right-24 -top-24 h-72 w-72 rounded-full bg-orange-500/[0.08] blur-3xl" />
+                <div className="relative grid gap-9 md:grid-cols-[1fr_auto] md:items-start">
+                  <div>
+                    <span className="mb-5 inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-orange-500/10 text-orange-300"><ShieldCheck size={21} /></span>
+                    <p className="mb-3 text-[10px] font-bold uppercase tracking-[0.2em] text-orange-300">Built with responsibility in mind</p>
+                    <h2 className="max-w-xl text-2xl font-semibold leading-tight tracking-tight text-white sm:text-4xl">Technology with empathy. AI with responsibility.</h2>
+                    <p className="mt-5 max-w-2xl text-sm leading-7 text-stone-400">
+                      MindMatrix.ai is designed as a supportive space for reflection. AI-generated responses can be incomplete or incorrect, and mood or stress estimates are not clinical assessments.
+                    </p>
+                  </div>
+                  <div className="flex h-14 w-14 items-center justify-center rounded-full border border-orange-400/20 bg-orange-500/[0.07] text-orange-300">
+                    <Heart size={24} />
+                  </div>
+                </div>
+
+                <div className="relative mt-8 grid gap-3 border-t border-white/[0.08] pt-7 sm:grid-cols-2">
+                  <div className="flex items-start gap-3">
+                    <Check size={15} className="mt-0.5 shrink-0 text-orange-300" />
+                    <p className="text-xs leading-5 text-stone-400">Saved check-in and chat history is stored in browser LocalStorage in the current implementation.</p>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <Check size={15} className="mt-0.5 shrink-0 text-orange-300" />
+                    <p className="text-xs leading-5 text-stone-400">Location-based resource discovery uses device location only when browser permission is granted.</p>
+                  </div>
+                </div>
+
+                <p className="relative mt-7 rounded-xl border border-orange-300/15 bg-orange-400/[0.05] p-4 text-xs leading-6 text-stone-300">
+                  MindMatrix.ai is not a medical diagnostic tool and does not replace qualified mental-health professionals. If you are in crisis or may be in immediate danger, contact local emergency services or a trusted professional.
+                </p>
+              </div>
+            </Reveal>
+          </div>
+        </section>
+
+        <section className="px-5 pb-24 sm:px-8 sm:pb-32">
+          <Reveal>
+            <div className="relative mx-auto max-w-7xl overflow-hidden rounded-[2rem] border border-orange-300/15 bg-[#1a120e] px-6 py-16 text-center sm:px-12 sm:py-20">
+              <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(249,115,22,0.16),transparent_58%)]" />
+              <div className="relative mx-auto max-w-2xl">
+                <span className="mx-auto mb-6 flex h-12 w-12 items-center justify-center rounded-2xl bg-orange-500 text-white shadow-lg shadow-orange-500/20"><Moon size={21} /></span>
+                <p className="mb-4 text-[10px] font-bold uppercase tracking-[0.2em] text-orange-300">Begin with one conversation</p>
+                <h2 className="text-3xl font-semibold leading-tight tracking-tight text-white sm:text-5xl">Make a little space for yourself.</h2>
+                <p className="mx-auto mt-5 max-w-xl text-sm leading-7 text-stone-400 sm:text-base">
+                  Check in, explore a new perspective and take your next step at your own pace.
+                </p>
+                <button onClick={onStart} className="group mt-9 inline-flex items-center gap-3 rounded-full bg-orange-500 px-7 py-4 text-sm font-bold text-white shadow-xl shadow-orange-500/20 transition-all hover:-translate-y-1 hover:bg-orange-400">
+                  Start chatting <ArrowRight size={17} className="transition-transform group-hover:translate-x-1" />
+                </button>
+                <p className="mt-5 text-[10px] text-stone-600">A supportive AI experience. Not a substitute for professional care.</p>
+              </div>
+            </div>
+          </Reveal>
+        </section>
+      </main>
+
+      <footer className="relative z-10 border-t border-white/[0.07] bg-[#090807] px-5 py-10 sm:px-8">
+        <div className="mx-auto flex max-w-7xl flex-col gap-8 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <a href="#home" aria-label="MindMatrix.ai home"><Logo /></a>
+            <p className="mt-3 max-w-sm text-xs leading-6 text-stone-600">An AI-powered companion for emotional reflection, conversations and everyday well-being.</p>
+          </div>
+
+          <div className="flex flex-wrap gap-x-6 gap-y-3 text-xs font-medium text-stone-500">
+            <a href="#features" className="transition-colors hover:text-white">Features</a>
+            <a href="#how-it-works" className="transition-colors hover:text-white">How it works</a>
+            <a href="#personas" className="transition-colors hover:text-white">AI personas</a>
+            <a href="#responsible-ai" className="transition-colors hover:text-white">Responsible AI</a>
+            <a href="https://github.com/ishant-rathore/MindMatrix.ai" target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 transition-colors hover:text-white">GitHub <ArrowUpRight size={12} /></a>
           </div>
         </div>
-      </section>
 
-      {/* CTA Footer */}
-      <section className="py-32 px-6 relative z-10">
-        <FadeIn>
-          <div className="max-w-5xl mx-auto bg-gradient-to-r from-orange-600 to-rose-600 rounded-[3rem] p-12 md:p-20 text-center shadow-2xl relative overflow-hidden">
-             {/* Deco glow */}
-             <div className="absolute top-0 left-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
-             <div className="absolute top-0 right-0 w-64 h-64 bg-white/20 rounded-full blur-3xl"></div>
-             
-             <h2 className="text-4xl md:text-6xl font-bold text-white mb-8 relative z-10 leading-tight font-heading">Ready to find your <br/><span className="text-orange-200">inner balance?</span></h2>
-             <p className="text-orange-100 text-lg md:text-xl mb-12 max-w-2xl mx-auto relative z-10 font-medium">
-               Start chatting with MindMatrix.ai today. It's free, private, and always available when you need it most.
-             </p>
-             <button 
-                onClick={onStart}
-                className="px-12 py-5 bg-white text-stone-900 hover:bg-stone-100 rounded-full font-bold text-lg transition-all hover:scale-105 active:scale-95 shadow-xl relative z-10"
-              >
-                Start Your Journey
-              </button>
-          </div>
-        </FadeIn>
-      </section>
-
-      {/* Copyright */}
-      <footer className="border-t border-stone-800 py-12 text-center text-stone-500 text-sm relative z-10 bg-stone-900">
-         <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-6">
-            <p>&copy; {new Date().getFullYear()} MindMatrix.ai. All rights reserved.</p>
-            <div className="flex gap-8 font-medium">
-              <a href="#" className="hover:text-orange-400 transition-colors">Privacy</a>
-              <a href="#" className="hover:text-orange-400 transition-colors">Terms</a>
-              <a href="#" className="hover:text-orange-400 transition-colors">Contact</a>
-            </div>
-         </div>
+        <div className="mx-auto mt-8 flex max-w-7xl flex-col gap-2 border-t border-white/[0.06] pt-6 text-[10px] text-stone-700 sm:flex-row sm:items-center sm:justify-between">
+          <span>© {new Date().getFullYear()} MindMatrix.ai. All rights reserved.</span>
+          <span>AI-generated information may be inaccurate. Not for diagnosis or emergency support.</span>
+        </div>
       </footer>
-
     </div>
   );
 };
