@@ -6,7 +6,6 @@ import {
   BrainCircuit,
   Check,
   ChevronRight,
-  GraduationCap,
   Heart,
   Languages,
   MapPin,
