@@ -4,7 +4,6 @@ import {
   ArrowRight,
   ArrowUpRight,
   BrainCircuit,
-  Briefcase,
   Check,
   ChevronRight,
   GraduationCap,
